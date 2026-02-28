@@ -112,7 +112,7 @@ export function IntegrationDialog({ isOpen, onClose, app, existingKey }: Integra
             <div className="relative">
               <Input
                 id="apiKey"
-                type="password"
+                type="text"
                 placeholder={`e.g. secret_${app.id}_12345...`}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
