@@ -1,0 +1,15 @@
+[Unit]
+Description=Sync Frontend Node.js Application
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=daniel
+WorkingDirectory=/home/daniel/sync-frontend
+EnvironmentFile=/home/daniel/sync-frontend/.env
+ExecStart=/usr/bin/node dist/index.cjs
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
