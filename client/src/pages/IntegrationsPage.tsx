@@ -12,9 +12,9 @@ import {
   SiGoogledrive, 
   SiConfluence, 
   SiPagerduty, 
-  SiDatadog, 
+  SiDatadog,
 } from "react-icons/si";
-import { CheckCircle2, Blocks, Server } from "lucide-react";
+import { CheckCircle2, Blocks, Cpu } from "lucide-react";
 import type { IconType } from "react-icons";
 
 // App metadata including specific brand colors
@@ -30,11 +30,11 @@ const INTEGRATION_APPS: AppInfo[] = [
   { id: 'linear', name: 'Linear', icon: SiLinear, color: '#5E6AD2' },
   { id: 'slack', name: 'Slack', icon: SiSlack, color: '#4A154B' },
   { id: 'github', name: 'GitHub', icon: SiGithub, color: '#181717' },
-  { id: 'google-drive', name: 'Google Drive', icon: SiGoogledrive, color: '#0F9D58' },
+  { id: 'google-drive', name: 'Google Drive', icon: SiGoogledrive, color: '#4285F4' },
   { id: 'confluence', name: 'Confluence', icon: SiConfluence, color: '#172B4D' },
   { id: 'pagerduty', name: 'PagerDuty', icon: SiPagerduty, color: '#06AC38' },
   { id: 'datadog', name: 'Datadog', icon: SiDatadog, color: '#632CA6' },
-  { id: 'servicenow', name: 'ServiceNow', icon: Server, color: '#81B5A1' },
+  { id: 'servicenow', name: 'ServiceNow', icon: Cpu, color: '#293E40' },
 ];
 
 export default function IntegrationsPage() {
@@ -62,13 +62,18 @@ export default function IntegrationsPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-6 py-16 md:py-24">
+      <main className="max-w-6xl mx-auto px-6 py-16 md:py-24 relative">
+        <div className="absolute top-16 right-6 hidden lg:block">
+          <div className="w-32 h-32 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-xl rotate-3">
+            <Blocks size={64} />
+          </div>
+        </div>
         <div className="max-w-2xl mb-16 space-y-4">
           <h1 className="text-4xl md:text-5xl font-extrabold font-display tracking-tight text-foreground">
             What do you want to integrate Orcho with?
           </h1>
           <p className="text-lg text-muted-foreground font-medium">
-            Connect your favorite tools to unlock powerful workflows, sync data automatically, and give Orcho the context it needs to excel.
+            Configure as many or as little from the following tools to allow Orcho remediate your context
           </p>
         </div>
 
@@ -90,7 +95,8 @@ export default function IntegrationsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {INTEGRATION_APPS.map((app) => {
               const Icon = app.icon;
-              const connected = isAppConnected(app.id);
+              const integration = integrations?.find(i => i.provider === app.id);
+              const connected = !!integration;
 
               return (
                 <Card 
@@ -126,7 +132,7 @@ export default function IntegrationsPage() {
                     }
                     onClick={() => setSelectedApp(app)}
                   >
-                    Connect
+                    {connected ? "Update Status" : "Connect"}
                   </Button>
                 </Card>
               );
@@ -139,7 +145,8 @@ export default function IntegrationsPage() {
       <IntegrationDialog 
         isOpen={!!selectedApp} 
         onClose={() => setSelectedApp(null)} 
-        app={selectedApp} 
+        app={selectedApp}
+        existingKey={integrations?.find(i => i.provider === selectedApp?.id)?.apiKey}
       />
     </div>
   );

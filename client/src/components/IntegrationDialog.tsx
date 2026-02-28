@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateIntegration } from "@/hooks/use-integrations";
-import { Loader2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import type { IconType } from "react-icons";
 
 interface AppInfo {
@@ -26,19 +26,20 @@ interface IntegrationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   app: AppInfo | null;
+  existingKey?: string;
 }
 
-export function IntegrationDialog({ isOpen, onClose, app }: IntegrationDialogProps) {
+export function IntegrationDialog({ isOpen, onClose, app, existingKey }: IntegrationDialogProps) {
   const [apiKey, setApiKey] = useState("");
   const { toast } = useToast();
   const createIntegration = useCreateIntegration();
 
-  // Reset form when dialog opens/closes
+  // Reset form when dialog opens/closes or existingKey changes
   useEffect(() => {
     if (isOpen) {
-      setApiKey("");
+      setApiKey(existingKey || "");
     }
-  }, [isOpen]);
+  }, [isOpen, existingKey]);
 
   const handleSave = () => {
     if (!app) return;
@@ -60,8 +61,8 @@ export function IntegrationDialog({ isOpen, onClose, app }: IntegrationDialogPro
       {
         onSuccess: () => {
           toast({
-            title: "Connected Successfully",
-            description: `Your ${app.name} account is now integrated with Orcho.`,
+            title: "Updated Successfully",
+            description: `Your ${app.name} integration has been updated.`,
           });
           onClose();
         },
@@ -94,7 +95,7 @@ export function IntegrationDialog({ isOpen, onClose, app }: IntegrationDialogPro
             </div>
             <div>
               <DialogTitle className="text-2xl font-bold font-display tracking-tight">
-                Connect to {app.name}
+                {existingKey ? `Update ${app.name} Status` : `Connect to ${app.name}`}
               </DialogTitle>
               <DialogDescription className="text-base mt-1">
                 Enter your API key below to securely link your {app.name} workspace with Orcho.
@@ -108,20 +109,32 @@ export function IntegrationDialog({ isOpen, onClose, app }: IntegrationDialogPro
             <Label htmlFor="apiKey" className="text-sm font-semibold">
               {app.name} API Key
             </Label>
-            <Input
-              id="apiKey"
-              type="password"
-              placeholder={`e.g. secret_${app.id}_12345...`}
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="font-mono text-sm px-4 py-6 border-border bg-muted/30 focus-visible:bg-background transition-colors shadow-sm"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSave();
-                }
-              }}
-            />
+            <div className="relative">
+              <Input
+                id="apiKey"
+                type="password"
+                placeholder={`e.g. secret_${app.id}_12345...`}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                className="font-mono text-sm pl-4 pr-12 py-6 border-border bg-muted/30 focus-visible:bg-background transition-colors shadow-sm"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSave();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-destructive transition-colors"
+                onClick={() => setApiKey("")}
+                title="Clear key"
+              >
+                <Trash2 size={18} />
+              </Button>
+            </div>
           </div>
           <p className="text-sm text-muted-foreground">
             Your key is encrypted and stored securely. You can revoke access at any time.
@@ -147,7 +160,7 @@ export function IntegrationDialog({ isOpen, onClose, app }: IntegrationDialogPro
             {createIntegration.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Connecting...
+                Saving...
               </>
             ) : (
               "Save"

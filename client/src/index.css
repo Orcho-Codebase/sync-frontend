@@ -93,6 +93,19 @@
   }
 }
 
+/* Hide Replit branding */
+iframe[src*="replit.com/repl-auth"] {
+  display: none !important;
+}
+
+#replit-badge, .replit-badge {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+
 @layer utilities {
   .hover-elevate {
     position: relative;
